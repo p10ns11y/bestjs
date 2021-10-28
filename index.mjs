@@ -18,7 +18,9 @@ const hasteMap = new JestHasteMap.default({
 });
 
 const { hasteFS } = await hasteMap.build();
-const testFiles = hasteFS.matchFilesWithGlob(['**/*.test.js']);
+const testFiles = hasteFS.matchFilesWithGlob([
+  process.argv[2] ? `**/${process.argv[2]}*` : '**/*.test.js',
+]);
 
 const worker = new Worker(join(root, 'worker.js'));
 

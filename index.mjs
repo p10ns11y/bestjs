@@ -1,6 +1,7 @@
 import { cpus } from 'os';
-import { dirname, join } from 'path';
+import { dirname, join, relative } from 'path';
 import { fileURLToPath } from 'url';
+import chalk from 'chalk';
 import JestHasteMap from 'jest-haste-map';
 import { Worker } from 'jest-worker';
 
@@ -23,8 +24,17 @@ const worker = new Worker(join(root, 'worker.js'));
 
 await Promise.all(
   Array.from(testFiles).map(async (testFile) => {
-    const testResult = await worker.runTest(testFile);
-    console.log(testResult);
+    const { status, errorMessage } = await worker.runTest(testFile);
+    const statusColor =
+      status === 'success'
+        ? chalk.green.inverse.bold(' PASS ')
+        : chalk.red.inverse.bold(' FAIL ');
+
+    console.log(`${statusColor} ${chalk.dim(relative(root, testFile))}`);
+
+    if (status !== 'success') {
+      console.log(`  ${errorMessage}`);
+    }
   })
 );
 

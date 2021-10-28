@@ -1,4 +1,6 @@
 const fs = require('fs');
+const expect = require('expect');
+const best = require('jest-mock');
 
 exports.runTest = async function runTest(testFile) {
   const code = await fs.promises.readFile(testFile, 'utf-8');
@@ -8,16 +10,6 @@ exports.runTest = async function runTest(testFile) {
   };
 
   try {
-    function expect(received) {
-      return {
-        toBe(expected) {
-          if (received !== expected) {
-            throw new Error(`Expected ${expected} but received ${received}.`);
-          }
-          return true;
-        },
-      };
-    }
     eval(code);
     testResult.status = 'success';
   } catch (error) {

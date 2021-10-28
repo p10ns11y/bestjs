@@ -24,6 +24,7 @@ const testFiles = hasteFS.matchFilesWithGlob([
 
 const worker = new Worker(join(root, 'worker.js'));
 
+let hasFailed = false;
 await Promise.all(
   Array.from(testFiles).map(async (testFile) => {
     const { status, errorMessage } = await worker.runTest(testFile);
@@ -35,9 +36,18 @@ await Promise.all(
     console.log(`${statusColor} ${chalk.dim(relative(root, testFile))}`);
 
     if (status !== 'success') {
+      hasFailed = true;
       console.log(`  ${errorMessage}`);
     }
   })
 );
 
 worker.end();
+if (hasFailed) {
+  console.log(
+    '\n' + chalk.red.bold('Test run failed, please fix all the failing tests.')
+  );
+
+  // Set an exit code to indicate failure.
+  process.exitCode = 1;
+}

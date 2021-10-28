@@ -1,7 +1,8 @@
-import JestHasteMap from 'jest-haste-map';
+import fs from 'fs';
 import { cpus } from 'os';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
+import JestHasteMap from 'jest-haste-map';
 
 // root path of the project (__dirname)
 const root = dirname(fileURLToPath(import.meta.url));
@@ -16,6 +17,11 @@ const hasteMap = new JestHasteMap.default({
 });
 
 const { hasteFS } = await hasteMap.build();
-const testFiles = hasteFS.getAllFiles();
+const testFiles = hasteFS.matchFilesWithGlob(['**/*.test.js']);
 
-console.log(testFiles);
+await Promise.all(
+  Array.from(testFiles).map(async (testFile) => {
+    const code = await fs.promises.readFile(testFile, 'utf-8');
+    console.log(testFile + ':\n' + code);
+  })
+);

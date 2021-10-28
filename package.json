@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "jest-haste-map": "^27.3.1"
+    "jest-haste-map": "^27.3.1",
+    "jest-worker": "^27.3.1"
   },
   "name": "best-test-framework",
   "version": "1.0.0",

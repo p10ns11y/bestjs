@@ -5,7 +5,8 @@ describe('circus test', () => {
 });
 
 describe('another circus test', () => {
-  test(`doesn't work`, () => {
+  test(`doesn't work`, async () => {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     expect(1).toBe(2);
   });
 });

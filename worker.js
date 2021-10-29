@@ -1,6 +1,7 @@
 const fs = require('fs');
 const expect = require('expect');
 const best = require('jest-mock');
+const { describe, test, it, run, resetState } = require('jest-circus');
 
 exports.runTest = async function runTest(testFile) {
   const code = await fs.promises.readFile(testFile, 'utf-8');
@@ -9,28 +10,25 @@ exports.runTest = async function runTest(testFile) {
     errorMessage: null,
   };
 
-  let testName;
   try {
-    describeFunctions = [];
-    let currentDescribeTestFunctions;
-    const describe = (name, fn) => describeFunctions.push([name, fn]);
-    const test = (name, fn) => currentDescribeTestFunctions.push([name, fn]);
-    const it = test;
+    resetState();
     eval(code);
-    describeFunctions.forEach(([name, fn]) => {
-      currentDescribeTestFunctions = [];
-      testName = name;
-      fn(); // call the decribe
+    const { testResults } = await run();
 
-      currentDescribeTestFunctions.forEach(([name, fn]) => {
-        testName += ` ${name}`;
-        fn(); // call test or it function
-      });
-    });
-    testResult.status = 'success';
+    testResult.results = testResults;
+
+    const allTestsPassed = testResults.every((result) =>
+      Boolean(!result.errors.length)
+    );
+
+    if (allTestsPassed) {
+      testResult.status = 'success';
+    } else {
+      testResult.status = 'error';
+    }
   } catch (error) {
     testResult.status = 'error';
-    testResult.errorMessage = `${testName}: ${error.message}`;
+    testResult.errorMessage = error.message;
   }
 
   return testResult;

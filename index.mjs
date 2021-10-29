@@ -27,7 +27,7 @@ const worker = new Worker(join(root, 'worker.js'));
 let hasFailed = false;
 await Promise.all(
   Array.from(testFiles).map(async (testFile) => {
-    const { status, errorMessage } = await worker.runTest(testFile);
+    const { status, results, errorMessage } = await worker.runTest(testFile);
     const statusColor =
       status === 'success'
         ? chalk.green.inverse.bold(' PASS ')
@@ -37,7 +37,18 @@ await Promise.all(
 
     if (status !== 'success') {
       hasFailed = true;
-      console.log(`  ${errorMessage}`);
+
+      if (results) {
+        results
+          .filter((result) => result.errors.length)
+          .forEach((result) =>
+            console.log(
+              `${result.testPath.slice(1).join(' ')}\n${result.errors[0]}`
+            )
+          );
+      } else if (errorMessage) {
+        console.log(`  ${errorMessage}`);
+      }
     }
   })
 );

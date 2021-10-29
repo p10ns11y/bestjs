@@ -5,7 +5,7 @@ describe('circus test', () => {
 });
 
 describe('another circus test', () => {
-  test(`doesn't works`, () => {
+  test(`doesn't work`, () => {
     expect(1).toBe(2);
   });
 });

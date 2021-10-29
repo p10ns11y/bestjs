@@ -11,7 +11,7 @@ const root = dirname(fileURLToPath(import.meta.url));
 const hasteMap = new JestHasteMap.default({
   extensions: ['js'],
   maxWorkers: cpus().length,
-  name: 'best-test-framework',
+  name: 'bestjs',
   platforms: [],
   rootDir: root,
   roots: [root],

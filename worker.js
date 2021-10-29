@@ -1,4 +1,5 @@
 const fs = require('fs');
+const vm = require('vm');
 const expect = require('expect');
 const best = require('jest-mock');
 const { describe, test, it, run, resetState } = require('jest-circus');
@@ -12,7 +13,16 @@ exports.runTest = async function runTest(testFile) {
 
   try {
     resetState();
-    eval(code);
+    const context = {
+      describe,
+      test,
+      it,
+      expect,
+      best,
+    };
+    vm.createContext(context);
+    vm.runInContext(code, context);
+
     const { testResults } = await run();
 
     testResult.results = testResults;
